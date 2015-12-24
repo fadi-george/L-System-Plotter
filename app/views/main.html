@@ -1,0 +1,42 @@
+<div  class = "pageWrapper" ng-controller="MainCtrl">
+
+  <div class="row">
+
+    <div class="titleBlock">
+      <h4>L-System Grapher</h4>
+      <img src="../images/fadi_gray.png" class="img-circle" height="32" width="32">
+    </div>
+
+
+    <div id = "graphInput" class="col-xs-12 col-sm-3">
+
+      <div class="boxWrap ">
+
+        <form>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Axiom (X)">
+          </div>
+
+          <div class="ruleGroup">
+            <div class="ruleWrapper">
+              <input type="text" class="letterRule form-control" placeholder=""  maxlength="1" >
+              <i class="fa fa-arrow-right"></i>
+              <input type="text" class="ruleChange form-control" placeholder="">
+            </div>
+
+          </div>
+          <button id = "ruleBtn" type="button" class="btn btn-default" ng-click="addRuel()">Add Rule</button>
+
+          <button type="button" class="btn btn-default" >Update</button>
+        </form>
+
+      </div>
+
+    </div>
+    <div class="col-xs-12 col-sm-9">
+        <div id = "drawBoard" class="panel panel-default">
+            <canvas >
+            </canvas>
+        </div>
+    </div>
+  </div>

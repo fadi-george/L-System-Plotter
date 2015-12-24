@@ -1,0 +1,66 @@
+// bower:scss
+// @import "font-awesome/scss/font-awesome.scss";
+@import "bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+$fa-font-path: "/bower_components/font-awesome/fonts/";
+@import "font-awesome/scss/font-awesome";
+// endbower
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300,100italic,100,300italic,500,400italic,500italic,700,700italic);
+p,h1,h2,h3,h4,input{ font-family: 'Roboto', sans-serif; }
+$BG-color: #E0E0E0;
+
+
+.pageWrapper{
+  margin: 0 15px;
+}
+html,body{
+  height: 100%;
+  background: $BG-color;
+}
+
+/*** HEADER INFORMATION ***/
+h4{
+  font-size: 24px;
+  color: #5F5F5F;
+  margin: 20px 20px 0px 0px;
+  text-align: right;
+}
+
+
+
+#graphInput{
+
+  .boxWrap{
+    margin: 32px 0px 0px 24px;
+  }
+}
+#drawBoard{
+  width: 90%;
+  margin: 36px auto;
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.07);
+  canvas{
+    width: 100%;
+    height: 100%;
+  }
+}
+.ruleGroup{
+  margin-bottom: 0px;
+}
+#ruleBtn{
+  width: 100%;
+}
+.ruleWrapper{
+  input[type="text"] {
+    float: left;
+  }
+  i{
+    float: left;
+  }
+  .letterRule{
+    width: 48px;
+    margin-right: 12px;
+  }
+  .ruleChange{
+    width: auto;
+    float: right;
+  }
+}
