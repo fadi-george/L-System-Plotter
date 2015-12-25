@@ -33,6 +33,7 @@ module.exports = function(config) {
       'bower_components/bootstrap-sass/assets/javascripts/bootstrap.js',
       'bower_components/animateCSS/dist/jquery.animatecss.js',
       'bower_components/semantic/dist/semantic.js',
+      'bower_components/material-design-lite/material.min.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       "app/scripts/**/*.js",

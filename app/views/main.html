@@ -13,21 +13,28 @@
       <div class="boxWrap ">
 
         <form>
-          <div class="form-group">
+          <div id = "axiom" class="ruleGroup">
             <input type="text" class="form-control" placeholder="Axiom (X)" >
           </div>
 
           <div class="ruleGroup">
-            <div class="ruleWrapper">
-              <input type="text" class="letterRule form-control" placeholder=""  maxlength="1" >
-              <i class="fa fa-arrow-right"></i>
+            <div id="ruleHeader">
+            </div>
+            <div class="ruleWrapper" ng-repeat="rules in numRules">
               <input type="text" class="ruleChange form-control" placeholder="">
+              <i class="fa fa-arrow-right"></i>
+              <input type="text" class="letterRule form-control" placeholder=""  maxlength="1" >
+              <p>{{rules}}</p>
+            </div>
+
+            <div class="buttonWrapper">
+              <button ng-disabled="numRules.length > 5" id = "addRule" type="button" class="btn btn-default" ng-click="addRule()"><i class="material-icons">add</i><p>Add Rule</p></button>
             </div>
 
           </div>
-          <button id = "ruleBtn" type="button" class="btn btn-default" ng-click="addRuel()">Add Rule</button>
 
-          <button type="button" class="btn btn-default" >Update</button>
+
+
         </form>
 
       </div>

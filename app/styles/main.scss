@@ -1,14 +1,14 @@
 // bower:scss
 // @import "font-awesome/scss/font-awesome.scss";
-@import "bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 $fa-font-path: "/bower_components/font-awesome/fonts/";
 @import "font-awesome/scss/font-awesome";
+@import "bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 // endbower
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,100italic,100,300italic,500,400italic,500italic,700,700italic);
 p,h1,h2,h3,h4,input{ font-family: 'Roboto', sans-serif; }
 $BG-color: #E0E0E0;
 
-
+/*** INITIAL MODIFICATIONS ***/
 .pageWrapper{
   margin: 0 15px;
   .row{
@@ -20,6 +20,9 @@ $BG-color: #E0E0E0;
 html,body{
   height: 100%;
   background: $BG-color;
+}
+.btn{
+  outline: none !important;
 }
 
 /*** HEADER INFORMATION ***/
@@ -56,12 +59,13 @@ html,body{
   height: 100% !important;
 }
 #graphInput{
-  width: 360px;
+  width: 408px;
   float: left;
+  background: #049870;
 }
 #drawGraph{
   background: white;
-  width: calc(100% - 360px);
+  width: calc(100% - 408px);
   float: left;
 }
 
@@ -69,21 +73,71 @@ html,body{
 input[type="text"] {
     border-radius: 0px;
 }
+#axiom{
+  margin-bottom: 20px;
+}
 .ruleGroup{
+  margin: 0px -28px 0px -28px;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2),0 -1px 0px rgba(0,0,0,0.02);
+  position: relative;
+  padding: 12px;
+  input[type="text"] {
+  }
+  span{
+    font-size: 16px;
+    font-weight: 300;
+  }
+  .ruleWrapper{
+    display: inline-block;
+    height: 34px;
+    width: 100%;
+    margin: 6px 0px;
+    i{
+      float: right;
+      position: relative;
+      top: 8px;
+      color: #B9B9B9;
+      margin: 0px 18px;
+    }
+    p{
+      float: left;
+      font-size: 20px;
+      position: relative;
+      text-align: left;
+      top: 4px;
+      left: 6px;
+    }
+  }
   .letterRule{
     width: 48px;
-    float: left;
-    margin-right: 12px;
+    float: right;
   }
-  i{
-    float: left;
-    position: relative;
-    top: 8px;
-    color: #B9B9B9;
-  }
+
   .ruleChange{
     width: 200px;
     float: right;
+  }
+
+  .buttonWrapper{
+    margin: 12px -12px -12px -12px;
+    padding: 8px 12px;
+    background: whitesmoke;
+  }
+  #addRule{
+    i{
+      float: left;
+      font-size: 24px;
+      margin-left: -5px;
+      margin-right: 6px;
+    }
+    p{
+      margin: 0px;
+      display: inline-block;
+      font-size: 16px;
+      font-weight: 300;
+    }
   }
 }
 

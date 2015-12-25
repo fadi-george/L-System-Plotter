@@ -1,14 +1,12 @@
 
 'use strict';
 
-angular.module('lSystemApp', []).controller('MainCtrl', function($scope , $window) {
+angular.module('lSystemApp', []).controller('MainCtrl', function($scope ) {
 
-
-  var w = angular.element($window);
-  console.log(w);
-  // w.resize(function(){
-  //     var h = w.innerHeight();
-  //     var myEl = angular.element( document.querySelector( 'graphInput' ) );
-  // });
+  $scope.numRules = ['1.','2.'];
+  $scope.addRule = function(){
+    var len = $scope.numRules.length;
+    $scope.numRules.push(len+1+'.');
+  };
 
 });
