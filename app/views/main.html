@@ -1,48 +1,28 @@
-<div  class = "pageWrapper" ng-controller="MainCtrl">
+<div  ng-controller="MainCtrl">
 
-  <div class="row">
-
-    <!-- <div class="titleBlock">
-      <h4>L-System Grapher</h4>
-      <img src="../images/fadi_g.png" class="img-circle" >
-    </div> -->
-
-
-    <div id = "graphInput"  >
-
-      <div class="boxWrap ">
-
-        <form>
-          <div id = "axiom" class="ruleGroup">
-            <input type="text" class="form-control" placeholder="Axiom (X)" >
-          </div>
-
-          <div class="ruleGroup">
-            <div id="ruleHeader">
-            </div>
-            <div class="ruleWrapper" ng-repeat="rules in numRules">
-              <input type="text" class="ruleChange form-control" placeholder="">
-              <i class="fa fa-arrow-right"></i>
-              <input type="text" class="letterRule form-control" placeholder=""  maxlength="1" >
-              <p>{{rules}}</p>
-            </div>
-
-            <div class="buttonWrapper">
-              <button ng-disabled="numRules.length > 5" id = "addRule" type="button" class="btn btn-default" ng-click="addRule()"><i class="material-icons">add</i><p>Add Rule</p></button>
-            </div>
-
-          </div>
-
-
-
-        </form>
-
-      </div>
-
+  <div layout="row" layout-xs="column">
+    <div flex="20">
+      I'm above on mobile, and to the left on larger devices.
     </div>
-    <div id="drawGraph"  >
-      {{windowHeight}}
-        <canvas >
-        </canvas>
+    <div flex>
+      <md-toolbar>
+        <div class="md-toolbar-tools">
+          <md-button class="md-icon-button" aria-label="Settings">
+            <i class="material-icons">play_arrow</i>
+          </md-button>
+          <h2>
+            <span>Toolbar with Icon Buttons</span>
+          </h2>
+          <span flex></span>
+          <md-button class="md-icon-button" aria-label="Favorite">
+            <i class="material-icons">play_arrow</i>
+          </md-button>
+          <md-button class="md-icon-button" aria-label="More">
+            <i class="material-icons">play_arrow</i>
+          </md-button>
+        </div>
+      </md-toolbar>
     </div>
   </div>
+
+</div>

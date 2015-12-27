@@ -1,7 +1,6 @@
-
 'use strict';
 
-angular.module('lSystemApp', []).controller('MainCtrl', function($scope ) {
+angular.module('lSystemApp', ['ngMaterial']).controller('MainCtrl', function($scope ) {
 
   $scope.numRules = ['1.','2.'];
   $scope.addRule = function(){
