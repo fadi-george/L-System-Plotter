@@ -1,28 +1,83 @@
-<div  ng-controller="MainCtrl">
 
-  <div layout="row" layout-xs="column">
-    <div flex="20">
-      I'm above on mobile, and to the left on larger devices.
-    </div>
-    <div flex>
-      <md-toolbar>
-        <div class="md-toolbar-tools">
-          <md-button class="md-icon-button" aria-label="Settings">
-            <i class="material-icons">play_arrow</i>
-          </md-button>
-          <h2>
-            <span>Toolbar with Icon Buttons</span>
-          </h2>
-          <span flex></span>
-          <md-button class="md-icon-button" aria-label="Favorite">
-            <i class="material-icons">play_arrow</i>
-          </md-button>
-          <md-button class="md-icon-button" aria-label="More">
-            <i class="material-icons">play_arrow</i>
-          </md-button>
+<div layout="row" flex id = "systemGraph"  ng-controller="MainCtrl" ng-cloak>
+
+  <md-sidenav id = "graphInput"  flex class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')">
+    <md-toolbar id="sideNavToolBar">
+      <h1 class="md-toolbar-tools">L-System Inputs</h1>
+    </md-toolbar>
+    <md-content id = "navInner" flex layout-padding >
+      <!-- Axiom  -->
+      <div class="inputBox">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Axiom" ng-model="axiom">
         </div>
-      </md-toolbar>
-    </div>
-  </div>
+      </div>
 
+      <!-- Rules  -->
+      <md-card layout-padding class = "md-whiteframe-z1">
+        <div layout="row" class="ruleWrapper" ng-repeat="rules in numRules">
+          <p class = "ruleNumber">{{rules}}</p>
+          <input type="text" class="form-control ruleLetter" >
+          <i class="material-icons ruleArrow">arrow_forward</i>
+          <input type="text" class="form-control ruleChange" >
+        </div>
+        <md-card-actions layout="row" layout-align="start center">
+          <md-button ng-disabled="numRules.length > 5" id = "addRule" ng-click="addRule()"><i class="material-icons">add</i>Rule</md-button>
+        </md-card-actions>
+      </md-card>
+
+    </md-content>
+
+
+  </md-sidenav>
+
+    <div flex layout="column">
+      <!-- Control Buttons (Toolbar)  -->
+      <md-content  >
+        <md-toolbar id = "controlBar" class="md-whiteframe-z1">
+          <div class="md-toolbar-tools">
+            <md-button class="md-icon-button" aria-label="Settings"  hide-gt-sm  ng-click="toggleLeft()">
+              <i class="material-icons">menu</i>
+            </md-button>
+            <md-button class="md-icon-button" aria-label="Settings"  tooltip-placement="right" uib-tooltip="Run"  tooltip-class="whiteBox">
+              <i class="material-icons" >play_arrow</i>
+            </md-button>
+            <h2>
+              <span></span>
+            </h2>
+            <span flex></span>
+            <md-button class="md-icon-button" aria-label="Favorite">
+              <i class="material-icons">play_arrow</i>
+            </md-button>
+            <md-button class="md-icon-button" aria-label="More">
+              <i class="material-icons">play_arrow</i>
+            </md-button>
+          </div>
+        </md-toolbar>
+      </md-content >
+
+      <div id = "cardWrapper" flex layout="column" class="md-padding">
+
+          <md-card flex >
+            <!-- Canvas Graph  -->
+            <div  id = "canvasWrapper" flex >
+              <canvas id = "graphCanvas" resizecanvas >
+              </canvs>
+            </div>
+            <md-card-actions layout="row" layout-align="end center">
+              <md-button class="md-icon-button" aria-label="Favorite">
+                <i class="material-icons">play_arrow</i>
+              </md-button>
+              <md-button class="md-icon-button" aria-label="Settings">
+                <i class="material-icons">play_arrow</i>
+              </md-button>
+              <md-button class="md-icon-button" aria-label="Share">
+                <i class="material-icons">play_arrow</i>
+              </md-button>
+            </md-card-actions>
+          </md-card>
+
+      </div>
+
+    </div >
 </div>

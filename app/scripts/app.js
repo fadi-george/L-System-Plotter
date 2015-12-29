@@ -1,14 +1,7 @@
 'use strict';
 
 angular
-  .module('lSystemApp', [
-    'ngMaterial',
-    'ngAnimate',
-    'ngCookies',
-    'ngResource',
-    'ngRoute',
-    'ngSanitize'
-  ])
+  .module('lSystemApp', [])
   .config(function ($routeProvider) {
     $routeProvider
       .otherwise({
