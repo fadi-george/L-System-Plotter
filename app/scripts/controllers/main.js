@@ -1,12 +1,16 @@
 'use strict';
 var app = angular.module('lSystemApp', ['ngMaterial','ngAnimate','ngCookies','ngResource','ngRoute','ngSanitize','ui.bootstrap']);
 
-app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav ) {
+app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) {
 
   // ------- Variables -----------------------------------------------
 
   $scope.axiom = '';
   $scope.gRules = [{'in':'','out':''}];
+  $scope.canvasChange = [];
+
+  var browserWindow = angular.element($window);
+  var canvas = angular.element( document.querySelector( '#graphCanvas' ) )[0];
 
   // Save in case of Refresh
   if( localStorage.axiom ){
@@ -27,6 +31,33 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav ) {
 
 
 
+  // ------- Helper Functions -----------------------------------------------
+
+  $scope.toggleLeft = function() {      // Toggle Left Side Nav
+    $mdSidenav('left').toggle();
+  };
+
+  $scope.validateRules = function(){    // Check for duplicate keys for rules
+    let seen = new Set();
+    let pos = 0;
+    var hasDuplicates = $scope.gRules.some(function(currentObject) {
+        pos++;
+        return seen.size === seen.add(currentObject.in).size;
+    });
+    if( hasDuplicates ){
+        pos--;
+    }
+
+  };
+  $scope.adjustCanvas = function(){
+    var w = angular.element( document.querySelector( '#graphCard' ) )[0].clientWidth;
+    var h = angular.element( document.querySelector( '#graphCard' ) )[0].clientHeight;
+    canvas.width = w - 16;
+    canvas.height = h - 16;
+  };
+
+
+
   // ------- Add Rule / Delete Rule -----------------------------------------------
 
   $scope.addRule = function(){
@@ -40,57 +71,43 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav ) {
 
 
   // ------- Initialization of Canvas Dimensions -------------------------------
-
-  angular.element(document).ready(function () {
-
-    $timeout( function(){
-      var w = angular.element( document.querySelector( '#canvasWrapper' ) )[0].clientWidth;
-      var h = angular.element( document.querySelector( '#canvasWrapper' ) )[0].clientHeight;
-      var c = angular.element( document.querySelector( '#graphCanvas' ) )[0];
-      c.width = w;
-      c.height = h;
-    } , 50);
-
+  $scope.$watch(
+    function () {
+      return $window.innerWidth;
+    },
+    function (value) {
+      $scope.adjustCanvas();
+      console.log('teste');
+    },
+    true
+  );
+  browserWindow.bind('resize', function(){
+    $scope.$apply();
   });
 
 
 
-  // ------- Helper Functions -----------------------------------------------
-
-  $scope.toggleLeft = function() {
-    $mdSidenav('left').toggle();
-  };
-  $scope.validateRules = function(){
-    let seen = new Set();
-    let pos = 0;
-    var hasDuplicates = $scope.gRules.some(function(currentObject) {
-        pos++;
-        return seen.size === seen.add(currentObject.in).size;
-    });
-    console.log(pos,hasDuplicates,seen);
-    if( hasDuplicates ){
-
-    }
-
-  };
-
 
   // ------ Update Canvas on Run -----------------------------------------------
   $scope.drawLSystem = function(){
-    var c = angular.element( document.querySelector( '#graphCanvas' ) );
-    var ctx = c.getContext('2d');
+    var ctx = canvas.getContext('2d');
   };
 
-}).directive('resizecanvas', function($window) {
-    return function(scope, element, attr) {
-        var w = angular.element($window);
-        w.on('resize', function() {
-            var w = angular.element( document.querySelector( '#canvasWrapper' ) )[0].clientWidth;
-            var h = angular.element( document.querySelector( '#canvasWrapper' ) )[0].clientHeight;
 
-            element.width = w;
-            element.height = h;
-            scope.$apply();
-        });
-    };
+
+  // ------ Maxmize or Minimize Screen Space -----------------------------------
+  $scope.fillScreen = function(){
+    $scope.canvasChange.push('cardMaximize');
+  };
+  $scope.shrinkScreen = function(){
+    $scope.canvasChange.pop();
+  };
+
+
+  // ------ When the Page Loads  -----------------------------------------------
+  angular.element(document).ready(function () {
+      $timeout(function(){
+        $scope.adjustCanvas();
+      },100);
+  });
 });

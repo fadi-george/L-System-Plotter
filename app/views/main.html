@@ -6,12 +6,34 @@
       <h1 class="md-toolbar-tools">L-System Inputs</h1>
     </md-toolbar>
     <md-content id = "navInner" flex layout-padding >
-      <!-- Axiom  -->
-      <div class="inputBox">
-        <div class="form-group">
+
+      <!-- Input Box for Axiom, Steps, and Angle -->
+      <md-card id = "inputBox" layout-padding layout="column" class="">
+        <md-card-header>
+
+          <md-card-header-text>
+            <span class="md-title">Title</span>
+          </md-card-header-text>
+        </md-card-header>
+        <div flex>
           <input type="text" class="form-control" placeholder="Axiom" ng-model="axiom" ng-change="updateAxiom()">
         </div>
-      </div>
+        <div id = "inputSplit" layout="row" flex >
+          <div layout="row" flex >
+            <md-button class="md-icon-button">
+              <i class="material-icons">menu</i>
+            </md-button>
+            <input flex type="text" class="form-control">
+          </div>
+          <div  layout="row" flex>
+            <md-button class="md-icon-button" >
+              <i class="material-icons">menu</i>
+            </md-button>
+            <input flex type="text" class="form-control">
+          </div>
+        </div>
+
+      </md-card>
 
       <!-- Rules  -->
       <md-card layout-padding class = "md-whiteframe-z1" >
@@ -34,13 +56,13 @@
 
     <div flex layout="column">
       <!-- Control Buttons (Toolbar)  -->
-      <div >
+      <div>
         <md-toolbar id = "controlBar" class="md-whiteframe-z1">
           <div class="md-toolbar-tools">
             <md-button class="md-icon-button" aria-label="Settings"  hide-gt-sm  ng-click="toggleLeft()">
               <i class="material-icons">menu</i>
             </md-button>
-            <md-button class="md-icon-button" aria-label="Settings"  tooltip-placement="right" uib-tooltip="Run"  tooltip-class="whiteBox">
+            <md-button class="md-icon-button" aria-label="Settings"  tooltip-placement="right" uib-tooltip="Run"  tooltip-class="whiteBox"  ng-click="drawLSystem()">
               <i class="material-icons" >play_arrow</i>
             </md-button>
             <h2>
@@ -57,15 +79,15 @@
         </md-toolbar>
       </div >
 
-      <div id = "cardWrapper" flex layout="column" class="md-padding">
-
-          <md-card flex >
-            <!-- Canvas Graph  -->
-            <div  id = "canvasWrapper" flex >
-              <canvas id = "graphCanvas" resizecanvas >
-              </canvs>
-            </div>
-            <md-card-actions layout="row" layout-align="end center">
+      <div id = "cardWrapper" flex layout-padding >
+        <!-- Canvas Graph  -->
+        <md-card id = "graphCard" ng-class="canvasChange" class="md-whiteframe-z2" flex >
+          <div  id = "canvasWrapper" flex >
+            <canvas id = "graphCanvas"  >
+            </canvs>
+          </div>
+          <div layout="row" id = "graphTools">
+            <div flex layout-align="start center">
               <md-button class="md-icon-button" aria-label="Favorite">
                 <i class="material-icons">play_arrow</i>
               </md-button>
@@ -75,9 +97,17 @@
               <md-button class="md-icon-button" aria-label="Share">
                 <i class="material-icons">play_arrow</i>
               </md-button>
-            </md-card-actions>
-          </md-card>
-
+            </div>
+            <div id = "optionsBotRight" flex layout-align="end center">
+              <md-button class="md-icon-button" ng-click="fillScreen()" ng-if="!canvasChange.length">
+                <i class="material-icons ">fullscreen</i>
+              </md-button>
+              <md-button class="md-icon-button" ng-click="shrinkScreen()" ng-if="canvasChange.length">
+                <i class="material-icons ">fullscreen_exit</i>
+              </md-button>
+            </div>
+          </div>
+        </md-card>
       </div>
 
     </div >
