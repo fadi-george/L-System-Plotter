@@ -7,9 +7,8 @@ body,html{
   height: 100%;
 }
 .ng-scope { height: 100%; }
-.form-control{
-  border-radius: 0px;
-}
+.form-control{ border-radius: 0px; }
+button:focus,i:focus {outline: none !important;}
 
 /*** ***/
 #sideNavToolBar{
@@ -53,6 +52,20 @@ body,html{
   .ruleLetter{
     width: 48px;
   }
+  .ruleDelete{
+    font-size: 20px;
+    color: #DADADA;
+    margin-left: 12px;
+    cursor: pointer;
+    width: 34px;
+    height: 34px;
+    padding-top: 6px;
+    text-align: right;
+    transition: color ease-in-out 0.15s;
+    &:hover{
+      color: #5D5D5D;
+    }
+  }
 }
 #addRule{
   margin: 0px 0px -12px -10px;
@@ -71,9 +84,11 @@ body,html{
     color: #000000;
     font-size: 14px;
     background-color: #ffffff;
+    border-radius: 2px;
+    padding: 5px 8px;
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
 }
 /* Hide arrow */
 .tooltip.whiteBox .tooltip-arrow {
-    border-color: #ffffff;
+    display: none;
 }

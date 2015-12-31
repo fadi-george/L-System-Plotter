@@ -9,20 +9,21 @@
       <!-- Axiom  -->
       <div class="inputBox">
         <div class="form-group">
-          <input type="text" class="form-control" placeholder="Axiom" ng-model="axiom">
+          <input type="text" class="form-control" placeholder="Axiom" ng-model="axiom" ng-change="updateAxiom()">
         </div>
       </div>
 
       <!-- Rules  -->
-      <md-card layout-padding class = "md-whiteframe-z1">
-        <div layout="row" class="ruleWrapper" ng-repeat="rules in numRules">
-          <p class = "ruleNumber">{{rules}}</p>
-          <input type="text" class="form-control ruleLetter" >
+      <md-card layout-padding class = "md-whiteframe-z1" >
+        <div layout="row" class="ruleWrapper" ng-repeat="gRule in gRules"  >
+          <p class = "ruleNumber">{{$index + 1 + '.'}}</p>
+          <input maxlength="1" type="text" class="form-control ruleLetter" ng-model = "gRules[$index].in" ng-change="updateRules()" >
           <i class="material-icons ruleArrow">arrow_forward</i>
-          <input type="text" class="form-control ruleChange" >
+          <input type="text" class="form-control ruleChange" ng-model = "gRules[$index].out" ng-change="updateRules()">
+          <i class="material-icons ruleDelete" ng-if = "gRules.length != 1" ng-click="deleteRule($index)">close</i>
         </div>
         <md-card-actions layout="row" layout-align="start center">
-          <md-button ng-disabled="numRules.length > 5" id = "addRule" ng-click="addRule()"><i class="material-icons">add</i>Rule</md-button>
+          <md-button ng-disabled="gRules.length > 5" id = "addRule" ng-click="addRule()"><i class="material-icons">add</i>Rule</md-button>
         </md-card-actions>
       </md-card>
 
@@ -33,7 +34,7 @@
 
     <div flex layout="column">
       <!-- Control Buttons (Toolbar)  -->
-      <md-content  >
+      <div >
         <md-toolbar id = "controlBar" class="md-whiteframe-z1">
           <div class="md-toolbar-tools">
             <md-button class="md-icon-button" aria-label="Settings"  hide-gt-sm  ng-click="toggleLeft()">
@@ -54,7 +55,7 @@
             </md-button>
           </div>
         </md-toolbar>
-      </md-content >
+      </div >
 
       <div id = "cardWrapper" flex layout="column" class="md-padding">
 
