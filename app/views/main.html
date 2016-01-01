@@ -10,26 +10,22 @@
       <!-- Input Box for Axiom, Steps, and Angle -->
       <md-card id = "inputBox" layout-padding layout="column" class="">
         <md-card-header>
-
           <md-card-header-text>
-            <span class="md-title">Title</span>
+            <span class="md-title">Inputs</span>
           </md-card-header-text>
         </md-card-header>
-        <div flex>
-          <input type="text" class="form-control" placeholder="Axiom" ng-model="axiom" ng-change="updateAxiom()">
+        <div layout="row"  flex>
+          <span flex >Axiom</span>
+          <input flex  type="text" class="form-control"  ng-model="axiom" ng-change="updateAxiom()">
         </div>
         <div id = "inputSplit" layout="row" flex >
           <div layout="row" flex >
-            <md-button class="md-icon-button">
-              <i class="material-icons">menu</i>
-            </md-button>
-            <input flex type="text" class="form-control">
+            <span flex>Steps</span>
+            <input flex type="number" ng-model="steps" ng-change="updateSteps()"  min="1" max="40"  class="form-control">
           </div>
-          <div  layout="row" flex>
-            <md-button class="md-icon-button" >
-              <i class="material-icons">menu</i>
-            </md-button>
-            <input flex type="text" class="form-control">
+          <div  layout="row" layout-align="end end" flex>
+            <span flex >Angle</span>
+            <input flex type="text" ng-model="angle" ng-change="updateAngle()" class="form-control">
           </div>
         </div>
 
@@ -37,6 +33,11 @@
 
       <!-- Rules  -->
       <md-card layout-padding class = "md-whiteframe-z1" >
+        <md-card-header>
+          <md-card-header-text>
+            <span class="md-title">Rules</span>
+          </md-card-header-text>
+        </md-card-header>
         <div layout="row" class="ruleWrapper" ng-repeat="gRule in gRules"  >
           <p class = "ruleNumber">{{$index + 1 + '.'}}</p>
           <input maxlength="1" type="text" class="form-control ruleLetter" ng-model = "gRules[$index].in" ng-change="updateRules()" >
@@ -62,7 +63,7 @@
             <md-button class="md-icon-button" aria-label="Settings"  hide-gt-sm  ng-click="toggleLeft()">
               <i class="material-icons">menu</i>
             </md-button>
-            <md-button class="md-icon-button" aria-label="Settings"  tooltip-placement="right" uib-tooltip="Run"  tooltip-class="whiteBox"  ng-click="drawLSystem()">
+            <md-button class="md-icon-button" aria-label="Settings"  tooltip-placement="right" uib-tooltip="Run"  tooltip-class="whiteBox"  ng-click="drawLSystem()" ng-disabled="isBusyDrawing">
               <i class="material-icons" >play_arrow</i>
             </md-button>
             <h2>
@@ -99,10 +100,10 @@
               </md-button>
             </div>
             <div id = "optionsBotRight" flex layout-align="end center">
-              <md-button class="md-icon-button" ng-click="fillScreen()" ng-if="!canvasChange.length">
+              <md-button class="md-icon-button" ng-click="fillScreen()" ng-show="!canvasChange.length">
                 <i class="material-icons ">fullscreen</i>
               </md-button>
-              <md-button class="md-icon-button" ng-click="shrinkScreen()" ng-if="canvasChange.length">
+              <md-button class="md-icon-button" ng-click="shrinkScreen()" ng-show="canvasChange.length" >
                 <i class="material-icons ">fullscreen_exit</i>
               </md-button>
             </div>
