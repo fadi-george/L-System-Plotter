@@ -8,20 +8,21 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
   $scope.axiom = '';
   $scope.gRules = [{'in':'','out':''}];
   $scope.steps = 1;                           // iteration steps
-  $scope.angle = 90;                          // drawing angle
+  $scope.angle = '90';                        // drawing angle
   $scope.unit = 20;                           // line distance
   $scope.canvasChange = [];
   $scope.isBusyDrawing = false;
 
   var browserWindow = angular.element($window);
   var canvas = angular.element( document.querySelector( '#graphCanvas' ) )[0];
+  var xmin = canvas.width, xmax = 0, ymin = canvas.height, ymax = 0;
 
   // Save in case of Refresh
   if( localStorage.axiom ){
     $scope.axiom = localStorage.axiom;
   }
   if( localStorage.steps ){
-    $scope.steps = localStorage.steps;
+    $scope.steps = parseInt(localStorage.steps);
   }
   if( localStorage.angle ){
     $scope.angle = localStorage.angle;
@@ -69,9 +70,11 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
   $scope.adjustCanvas = function(){
     var w = angular.element( document.querySelector( '#graphCard' ) )[0].clientWidth;
     var h = angular.element( document.querySelector( '#graphCard' ) )[0].clientHeight;
-    
+    var ctx = canvas.getContext('2d');
+    var imgDat = ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height);
     canvas.width = w - 16;
     canvas.height = h - 16;
+    ctx.putImageData(imgDat,0,0);
   };
 
   // Take axiom and perform replacement operations for each rule
@@ -88,7 +91,24 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
     }
     return newStr;
   }
-
+  //
+  // function iterateString2(){
+  //   var newStr = '' , k = 0;
+  //   // Iterate on number of steps
+  //   for (var i = 0; i < $scope.steps; i++) {
+  //     for( var j = 0; j < $scope.axiom.length; j++){
+  //       for (var idx in $scope.gRules) {
+  //         var rule = $scope.gRules[idx];
+  //         if(rule.in){
+  //           if( $scope.axiom[j] === rule.in ){
+  //             newStr += rule.out;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return newStr;
+  // }
 
   // ------- Add Rule / Delete Rule -----------------------------------------------
 
@@ -129,36 +149,28 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
     localStorage.isExpanded = 'false';
     $timeout( $scope.adjustCanvas , 15 );
   };
-  if( JSON.parse(localStorage.isExpanded) ){
+  if( localStorage.isExpanded && JSON.parse(localStorage.isExpanded) ){
     $scope.fillScreen();
   }
 
 
   // ------ Update Canvas on Run -----------------------------------------------
-  $scope.drawLSystem = function(){
-    // Get canvas context and end string
-    $scope.isBusyDrawing = true;
-    var ctx = canvas.getContext('2d') , str = iterateString();
 
-    // Clean Canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function getBoundary( str ){
 
-    // Convert Angle to Radians and get line drawing length
-    var ch , angleRef = $scope.angle*(Math.PI / 180) , r = $scope.unit;
-    var x = canvas.width >> 1 , y = canvas.height >> 1 , angle = 0;
-
+    var ch , r = $scope.unit , x = 0 , y = 0;
+    xmin = 0; ymin = 0; xmax = 0; ymax = 0;
+    var angleRef = $scope.angle*(Math.PI / 180) , angle = 0;
     for (var i = 0; i < str.length; i++) {
       ch = str[i];
-      ctx.beginPath();
 
       if( ch === 'F' ){           // Forward Segment
-        ctx.moveTo( x , y );
-        console.log(x , y );
         x = x + r*Math.cos(angle);
         y = y + r*Math.sin(angle);
-        console.log(x , y );
-        ctx.lineTo( x , y );
-        ctx.stroke();
+        xmin = Math.min(x,xmin);
+        xmax = Math.max(x,xmax);
+        ymin = Math.min(y,ymin);
+        ymax = Math.max(y,ymax);
 
       }else if( ch === '+' ){     // Update Angle
         angle += angleRef;
@@ -170,6 +182,71 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
 
       }
     }
+  }
+
+  function drawString( str , xStart , yStart , scaleFactor ){
+    var ctx = canvas.getContext('2d');
+    ctx.translate( xStart , yStart );
+    ctx.scale( scaleFactor , scaleFactor);
+    ctx.translate( -xStart , -yStart );
+
+    var ch , angleRef = $scope.angle*(Math.PI / 180) , r = $scope.unit;
+    var x = xStart , y = yStart, angle = 0;
+
+    for (var i = 0; i < str.length; i++) {
+      ch = str[i];
+      ctx.beginPath();
+
+      if( ch === 'F' ){           // Forward Segment
+        ctx.moveTo( x , y );
+        x = x + r*Math.cos(angle);
+        y = y + r*Math.sin(angle);
+        ctx.lineTo( x , y );
+        ctx.stroke();
+        ctx.lineCap = 'round';
+
+      }else if( ch === '+' ){     // Update Angle
+        angle += angleRef;
+
+      }else if( ch === '-' ){
+        angle -= angleRef;
+
+      }else{
+
+      }
+    }
+
+  }
+
+  function fitToCanvas( xmin , xmax , ymin , ymax , str ){
+    var ctx = canvas.getContext('2d');
+    var xdis = xmax - xmin;
+    var ydis = ymax - ymin;
+    var w = canvas.width*0.6, h = canvas.height*0.6 , zoom;
+
+    if( w/xdis > h/ydis ){
+      zoom = h/ydis;
+    }else{
+      zoom = w/xdis;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawString( str , canvas.width/2 - (xmin + xdis/2)*zoom , canvas.height/2 - (ymin + ydis/2)*zoom , zoom );
+  }
+
+  $scope.drawLSystem = function(){
+    // Get canvas context and end string
+    $scope.isBusyDrawing = true;
+
+    var ctx = canvas.getContext('2d') , str = iterateString();
+
+    // Reset Transform
+    ctx.setTransform(1,0,0,1,0,0);
+
+    // Clean Canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    getBoundary( str );
+    fitToCanvas( xmin , xmax , ymin , ymax , str );
 
     $scope.isBusyDrawing = false;
   };

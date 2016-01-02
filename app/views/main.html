@@ -8,7 +8,7 @@
     <md-content id = "navInner" flex layout-padding >
 
       <!-- Input Box for Axiom, Steps, and Angle -->
-      <md-card id = "inputBox" layout-padding layout="column" class="">
+      <md-card id = "inputBox" layout-padding layout="column" class=md-whiteframe-z2>
         <md-card-header>
           <md-card-header-text>
             <span class="md-title">Inputs</span>
@@ -32,7 +32,7 @@
       </md-card>
 
       <!-- Rules  -->
-      <md-card layout-padding class = "md-whiteframe-z1" >
+      <md-card layout-padding class = "md-whiteframe-z2" >
         <md-card-header>
           <md-card-header-text>
             <span class="md-title">Rules</span>
@@ -83,6 +83,7 @@
       <div id = "cardWrapper" flex layout-padding >
         <!-- Canvas Graph  -->
         <md-card id = "graphCard" ng-class="canvasChange" class="md-whiteframe-z2" flex >
+          <!-- <i class="material-icons crossHair">add</i> -->
           <div  id = "canvasWrapper" flex >
             <canvas id = "graphCanvas"  >
             </canvs>
