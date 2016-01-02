@@ -12,6 +12,7 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
   $scope.unit = 20;                           // line distance
   $scope.canvasChange = [];
   $scope.isBusyDrawing = false;
+  $scope.lString = '';
 
   var browserWindow = angular.element($window);
   var canvas = angular.element( document.querySelector( '#graphCanvas' ) )[0];
@@ -26,6 +27,14 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
   }
   if( localStorage.angle ){
     $scope.angle = localStorage.angle;
+  }
+  if( localStorage.imgData ){
+    var img = new Image();
+    img.src = localStorage.imgData;
+    $timeout( function(){
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    } , 200);
   }
   if( localStorage.gRules ){
     var arr = JSON.parse( localStorage.gRules );
@@ -67,15 +76,6 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
     }
 
   };
-  $scope.adjustCanvas = function(){
-    var w = angular.element( document.querySelector( '#graphCard' ) )[0].clientWidth;
-    var h = angular.element( document.querySelector( '#graphCard' ) )[0].clientHeight;
-    var ctx = canvas.getContext('2d');
-    var imgDat = ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height);
-    canvas.width = w - 16;
-    canvas.height = h - 16;
-    ctx.putImageData(imgDat,0,0);
-  };
 
   // Take axiom and perform replacement operations for each rule
   function iterateString(){
@@ -88,27 +88,22 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
           newStr = newStr.replace( new RegExp(rule.in,'g') ,rule.out);
         }
       }
+      if( newStr.length > 120000000 ){
+        return 'longString';
+      }
     }
     return newStr;
   }
-  //
-  // function iterateString2(){
-  //   var newStr = '' , k = 0;
-  //   // Iterate on number of steps
-  //   for (var i = 0; i < $scope.steps; i++) {
-  //     for( var j = 0; j < $scope.axiom.length; j++){
-  //       for (var idx in $scope.gRules) {
-  //         var rule = $scope.gRules[idx];
-  //         if(rule.in){
-  //           if( $scope.axiom[j] === rule.in ){
-  //             newStr += rule.out;
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return newStr;
-  // }
+
+  $scope.adjustCanvas = function(){
+    var w = angular.element( document.querySelector( '#graphCard' ) )[0].clientWidth;
+    var h = angular.element( document.querySelector( '#graphCard' ) )[0].clientHeight;
+    canvas.width = w - 16;
+    canvas.height = h - 16;
+    $scope.drawLSystem();
+  };
+
+
 
   // ------- Add Rule / Delete Rule -----------------------------------------------
 
@@ -157,7 +152,6 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
   // ------ Update Canvas on Run -----------------------------------------------
 
   function getBoundary( str ){
-
     var ch , r = $scope.unit , x = 0 , y = 0;
     xmin = 0; ymin = 0; xmax = 0; ymax = 0;
     var angleRef = $scope.angle*(Math.PI / 180) , angle = 0;
@@ -184,11 +178,13 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
     }
   }
 
-  function drawString( str , xStart , yStart , scaleFactor ){
+  function drawString( str , xStart , yStart , scaleFactor , rotation ){
     var ctx = canvas.getContext('2d');
     ctx.translate( xStart , yStart );
     ctx.scale( scaleFactor , scaleFactor);
     ctx.translate( -xStart , -yStart );
+
+    ctx.lineWidth=10;
 
     var ch , angleRef = $scope.angle*(Math.PI / 180) , r = $scope.unit;
     var x = xStart , y = yStart, angle = 0;
@@ -202,8 +198,8 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
         x = x + r*Math.cos(angle);
         y = y + r*Math.sin(angle);
         ctx.lineTo( x , y );
-        ctx.stroke();
         ctx.lineCap = 'round';
+        ctx.stroke();
 
       }else if( ch === '+' ){     // Update Angle
         angle += angleRef;
@@ -215,30 +211,43 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
 
       }
     }
-
   }
 
   function fitToCanvas( xmin , xmax , ymin , ymax , str ){
     var ctx = canvas.getContext('2d');
     var xdis = xmax - xmin;
     var ydis = ymax - ymin;
-    var w = canvas.width*0.6, h = canvas.height*0.6 , zoom;
+    var w = canvas.width*0.75, h = canvas.height*0.75 , zoom , rotation = 0;
 
     if( w/xdis > h/ydis ){
-      zoom = h/ydis;
+      zoom = h/ydis ;
     }else{
       zoom = w/xdis;
     }
+    if( ydis > xdis ){
+      rotation = Math.PI;
+    }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawString( str , canvas.width/2 - (xmin + xdis/2)*zoom , canvas.height/2 - (ymin + ydis/2)*zoom , zoom );
+    drawString( str , canvas.width/2 - (xmin + xdis/2)*zoom , canvas.height/2 - (ymin + ydis/2)*zoom , zoom , rotation );
   }
 
   $scope.drawLSystem = function(){
     // Get canvas context and end string
     $scope.isBusyDrawing = true;
 
-    var ctx = canvas.getContext('2d') , str = iterateString();
+    var ctx = canvas.getContext('2d') , str;
+
+    if( $scope.lString  ){
+      str = $scope.lString;
+    }else{
+      str = iterateString();
+    }
+
+    if( str === 'longString' ){
+
+      return;
+    }
 
     // Reset Transform
     ctx.setTransform(1,0,0,1,0,0);
@@ -247,9 +256,16 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     getBoundary( str );
     fitToCanvas( xmin , xmax , ymin , ymax , str );
-
+    localStorage.imgData = canvas.toDataURL();
     $scope.isBusyDrawing = false;
   };
+
+
+
+  // ------ Graph Tools  -----------------------------------------------
+
+
+
 
 
 
