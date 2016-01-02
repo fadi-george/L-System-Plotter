@@ -1,7 +1,7 @@
 'use strict';
 var app = angular.module('lSystemApp', ['ngMaterial','ngAnimate','ngCookies','ngResource','ngRoute','ngSanitize','ui.bootstrap']);
 
-app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) {
+app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast , $window ) {
 
   // ------- Variables -----------------------------------------------
 
@@ -34,7 +34,7 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
     $timeout( function(){
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    } , 100);
+    } , 200);
   }
   if( localStorage.gRules ){
     var arr = JSON.parse( localStorage.gRules );
@@ -105,7 +105,7 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
       }
 
       prev = newStr;
-      if( prev.length > 120000000 ){
+      if( prev.length > 10000000 ){
         return 'longString';
       }
     }
@@ -259,6 +259,10 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
 
   $scope.drawLSystem = function( ){
     // Get canvas context and end string
+
+    if( !ready ){
+      return;
+    }
     $scope.isBusyDrawing = true;
 
     var ctx = canvas.getContext('2d') , str;
@@ -269,12 +273,20 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
       str = iterateString();
       $scope.lString = str;
     }
-    if( str === 'longString' || str === '' || !ready ){
+    if( str === 'longString' || str === ''){
+      $mdToast.show(
+        $mdToast.simple()
+          .textContent('String is too large to draw.')
+          .position('top right')
+          .action('OK')
+          .hideDelay(10000)
+          .parent(angular.element( document.querySelector( '#cardWrapper' ))[0])
+      );
+
       $scope.isBusyDrawing = false;
       return;
     }
 
-    console.log(str);
     // Reset Transform
     ctx.setTransform(1,0,0,1,0,0);
 
@@ -286,7 +298,6 @@ app.controller('MainCtrl', function($scope , $timeout ,  $mdSidenav , $window ) 
     localStorage.imgData = canvas.toDataURL();
     $scope.isBusyDrawing = false;
   };
-
 
 
   // ------ Graph Tools  -----------------------------------------------

@@ -57,6 +57,7 @@ canvas{
 #cardWrapper{
   background: #CECECE;
   overflow: auto;
+  position: relative;
 }
 #graphCard{
   position: relative;
@@ -166,6 +167,10 @@ canvas{
   }
 }
 
+/*** Toast ***/
+.md-toast-content{
+  margin: 15px 14px 0px 0px;
+}
 
 /*** Tooltip Changes ***/
 .tooltip.whiteBox .tooltip-inner {
