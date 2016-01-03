@@ -112,10 +112,23 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
     return newStr;
   }
 
-  //
-  // function getClosingBracket( ch ){
-  //   if( ch ===)
-  // };
+  // Find first matching end bracket/paranthesis
+  function getClosingBracket( idx , str , endCh ){
+    var ch = str[idx] , nest = 0;
+
+    for( var i = idx+1; i < str.length ; i++ ){
+      if( str[i] === ch ){                          //  starting },], or )
+        nest++;                                     //  avoid nest traps
+      }
+      if( str[i] === endCh ){              // Found matching closing },],)
+        if( nest === 0 ){
+          return i;
+        }else{
+          nest--;
+        }
+      }
+    }
+  }
 
   // Redraw if resolution of canvas changed
   $scope.adjustCanvas = function(){
@@ -173,10 +186,11 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
   // ------ Update Canvas on Run -----------------------------------------------
 
-  function getBoundary( str ){
-    var ch , r = $scope.unit , x = 0 , y = 0;
-    xmin = 0; ymin = 0; xmax = 0; ymax = 0;
-    var angleRef = $scope.angle*(Math.PI / 180) , angle = 0;
+  function getBoundary( str  , xStart , yStart , angleIn ){
+
+    var ch , r = $scope.unit , x = xStart , y = xStart;
+    var angleRef = $scope.angle*(Math.PI / 180) , angle = angleIn;
+
     for (var i = 0; i < str.length; i++) {
       ch = str[i];
 
@@ -194,7 +208,10 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
       }else if( ch === '-' ){
         angle -= angleRef;
 
-      }else if( ch === '[' ){     // Recursive Call
+      }else if( ch === '[' ){                 // Recursive Call
+        var k = getClosingBracket( i , str , ']' );
+        getBoundary( str.substring(i+1, k) , x , y , angle );
+        i = k;
 
       }else{
 
@@ -202,22 +219,19 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
     }
   }
 
-  function drawString( str , xStart , yStart , scaleFactor , rotation ){
-    var ctx = canvas.getContext('2d');
-    ctx.translate( xStart , yStart );
-    ctx.scale( scaleFactor , scaleFactor);
-    ctx.translate( -xStart , -yStart );
+  function drawString( str , xStart , yStart , scaleFactor , rotation , startingAngle ){
 
-    ctx.lineWidth=10;
+    var ctx = canvas.getContext('2d');
+    ctx.lineWidth = 2;
 
     var ch , angleRef = $scope.angle*(Math.PI / 180) , r = $scope.unit;
-    var x = xStart , y = yStart, angle = 0;
+    var x = xStart , y = yStart, angle = startingAngle;
 
     for (var i = 0; i < str.length; i++) {
       ch = str[i];
       ctx.beginPath();
 
-      if( ch === 'F' ){           // Forward Segment
+      if( ch === 'F' ){                    // Forward Segment
         ctx.moveTo( x , y );
         x = x + r*Math.cos(angle);
         y = y + r*Math.sin(angle);
@@ -225,13 +239,18 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
         ctx.lineCap = 'round';
         ctx.stroke();
 
-      }else if( ch === '+' ){     // Update Angle
+      }else if( ch === '+' ){              // Update Angle
         angle += angleRef;
 
       }else if( ch === '-' ){
         angle -= angleRef;
 
-      }else if( ch === '[' ){     // Recursive Call
+      }else if( ch === '[' ){                                  // Recursive Call
+        var k = getClosingBracket( i , str , ']' );
+        // ctx.save();
+        drawString( str.substring(i+1, k) , x , y , scaleFactor , rotation , angle );
+        // ctx.restore();
+        i = k;
 
       }else{
 
@@ -251,10 +270,24 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
       zoom = w/xdis;
     }
     if( ydis > xdis ){
-      rotation = Math.PI;
+      rotation = -Math.PI/2;
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawString( str , canvas.width/2 - (xmin + xdis/2)*zoom , canvas.height/2 - (ymin + ydis/2)*zoom , zoom , rotation );
+
+    var xStart = canvas.width/2 - (xmin + xdis/2)*zoom ,
+        yStart = canvas.height/2 - (ymin + ydis/2)*zoom;
+
+    ctx.translate( xStart , yStart );
+        ctx.scale( zoom , zoom );
+    ctx.translate( -xStart , -yStart );
+
+    var midX = xStart + (canvas.width/2 - xStart)/zoom ,
+        midY = yStart + (canvas.height/2 - yStart)/zoom;
+
+    ctx.translate( midX , midY );
+        ctx.rotate(rotation);
+    ctx.translate( -midX  , -midY );
+    drawString( str , xStart , yStart , zoom , rotation , 0 );
   }
 
   $scope.drawLSystem = function( ){
@@ -273,7 +306,7 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
       str = iterateString();
       $scope.lString = str;
     }
-    if( str === 'longString' || str === ''){
+    if( str === 'longString'){
       $mdToast.show(
         $mdToast.simple()
           .textContent('String is too large to draw.')
@@ -289,10 +322,12 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
     // Reset Transform
     ctx.setTransform(1,0,0,1,0,0);
+    console.log( str );
 
     // Clean Canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    getBoundary( str );
+    xmin = 0; ymin = 0; xmax = 0; ymax = 0;
+    getBoundary( str , 0 , 0 , 0 );
 
     fitToCanvas( xmin , xmax , ymin , ymax , str );
     localStorage.imgData = canvas.toDataURL();

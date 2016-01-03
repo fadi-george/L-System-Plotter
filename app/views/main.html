@@ -43,7 +43,7 @@
           <input maxlength="1" type="text" class="form-control ruleLetter" ng-model = "gRules[$index].in" ng-change="updateRules()" >
           <i class="material-icons ruleArrow">arrow_forward</i>
           <input type="text" class="form-control ruleChange" ng-model = "gRules[$index].out" ng-change="updateRules()">
-          <i class="material-icons ruleDelete" ng-if = "gRules.length != 1" ng-click="deleteRule($index)">close</i>
+          <i class="material-icons ruleDelete" ng-show = "gRules.length != 1" ng-click="deleteRule($index)">close</i>
         </div>
         <md-card-actions layout="row" layout-align="start center">
           <md-button ng-disabled="gRules.length > 5" id = "addRule" ng-click="addRule()"><i class="material-icons">add</i>Rule</md-button>
