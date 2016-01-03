@@ -5,18 +5,29 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
   // ------- Variables -----------------------------------------------
 
-  $scope.axiom = '';
-  $scope.gRules = [{'in':'','out':''}];
+  $scope.axiom = '';                          // axiom
+  $scope.gRules = [{'in':'','out':''}];       // replacement rules
   $scope.steps = 1;                           // iteration steps
   $scope.angle = '90';                        // drawing angle
   $scope.unit = 20;                           // line distance
-  $scope.canvasChange = [];
-  $scope.isBusyDrawing = false;
-  $scope.lString = '';
+  $scope.canvasChange = [];                   // for shrinking and expanding canvas
+  $scope.isBusyDrawing = false;               // don't draw till page loads
+  $scope.lString = '';                        // keep string till new inputs
+  $scope.mouseDown = false;                   // keep track of mouse
 
-  var browserWindow = angular.element($window);
-  var canvas = angular.element( document.querySelector( '#graphCanvas' ) )[0];
-  var xmin = canvas.width, xmax = 0, ymin = canvas.height, ymax = 0 , ready = false;
+  $scope.canvasMode = 0;                      // canvas options (zooming / panning)
+  /* 0 for nothing selected,
+     1 for panning ,
+     2 for zooming in,
+     3 for zooming out
+ */
+
+  var browserWindow = angular.element($window),
+      canvas = angular.element( document.querySelector( '#graphCanvas' ) )[0];
+
+  var xmin = canvas.width, xmax = 0, ymin = canvas.height, ymax = 0 ,
+      ready = false,
+      clickStartX , clickStartY , newX , newY , dx , dy;
 
   // Save in case of Refresh
   if( localStorage.axiom ){
@@ -154,6 +165,7 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
 
   // ------- Initialization of Canvas Dimensions -------------------------------
+
   $scope.$watch(
     function () {
     },
@@ -322,7 +334,6 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
     // Reset Transform
     ctx.setTransform(1,0,0,1,0,0);
-    console.log( str );
 
     // Clean Canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -337,10 +348,39 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
   // ------ Graph Tools  -----------------------------------------------
 
+  $scope.canvasMouseDown = function( $event ){
+    clickStartX = $event.offsetX;
+    clickStartY = $event.offsetY;
+    $scope.mouseDown = true;
+  };
+
+  $scope.canvasMouseMove = function( $event ){
+    newX = $event.offsetX;
+    newY = $event.offsetY;
+
+    if( $scope.mouseDown ){
+
+      if( $scope.canvasMode === 1 ){
+
+        dx = newX - clickStartX;
+        dy = newY - clickStartY;
 
 
+      }
 
+    }
+  };
 
+  // Mouse click/hold over
+  $scope.canvasMouseUp = function( $event ){
+     $scope.mouseDown = false;
+     clickStartX = clickStartY = -1;
+  };
+
+  // Clear Mode if outside canvas
+  $scope.canvasMouseLeave = function(  ){
+    //  $scope.canvasMode = 0;
+  };
 
   // ------ When the Page Loads  -----------------------------------------------
   angular.element(document).ready(function () {

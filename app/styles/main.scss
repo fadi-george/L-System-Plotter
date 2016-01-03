@@ -1,5 +1,8 @@
+$fa-font-path: "/bower_components/font-awesome/fonts/";
+@import "font-awesome/scss/font-awesome";
 // bower:scss
 @import "bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+@import "font-awesome/scss/font-awesome.scss";
 // endbower
 @import url(https://fonts.googleapis.com/icon?family=Material+Icons);
 body,html{
@@ -18,6 +21,13 @@ button:focus,i:focus {
   border-radius: 0px;
   font-size: 15px;
   font-family: 'Roboto';
+}
+.fa{
+  width: 24px;
+  position: relative;
+  font-size: 20px;
+  float: left;
+  margin-top: 2px;
 }
 
 /*** Toolbars ***/
@@ -158,13 +168,17 @@ canvas{
   float: left;
   margin-top: -40px;
   .md-icon-button{
-    color: #D0D0D0;
+    color: #A7A2A2;
     transition: color ease-in-out 0.15s , transform ease-in-out 0.15s;
     &:hover{
       color: #0E87FF;
       transform: scale(1.4,1.4);
     }
   }
+}
+.graphToolsActive{
+  color: #0E87FF !important;
+  transform: scale(1.4,1.4) !important;
 }
 
 /*** Toast ***/
