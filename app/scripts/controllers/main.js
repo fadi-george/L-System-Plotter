@@ -23,11 +23,14 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
  */
 
   var browserWindow = angular.element($window),
-      canvas = angular.element( document.querySelector( '#graphCanvas' ) )[0];
+      canvas = angular.element( document.querySelector( '#graphCanvas' ) )[0],
+      canvasElement = angular.element( document.querySelector( '#graphCanvas' ) );
 
   var xmin = canvas.width, xmax = 0, ymin = canvas.height, ymax = 0 ,
-      ready = false,
-      clickStartX , clickStartY , newX , newY , dx , dy;
+      ctx = canvas.getContext('2d') , ready = false,
+      clickStartX , clickStartY , newX , newY , dx , dy ,
+      panStartX , panStartY , midX , midY ,
+      scaleFactor = 1 , rotation , rotationCount = 0;
 
   // Save in case of Refresh
   if( localStorage.axiom ){
@@ -43,9 +46,10 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
     var img = new Image();
     img.src = localStorage.imgData;
     $timeout( function(){
-      var ctx = canvas.getContext('2d');
+
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    } , 200);
+      $scope.drawLSystem();
+    } , 150);
   }
   if( localStorage.gRules ){
     var arr = JSON.parse( localStorage.gRules );
@@ -147,10 +151,20 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
     var h = angular.element( document.querySelector( '#graphCard' ) )[0].clientHeight;
     canvas.width = w - 16;
     canvas.height = h - 16;
-    $scope.drawLSystem();
+    if( canvas.width < 0 ){
+      $scope.adjustCanvas();
+    }else{
+      $scope.drawLSystem();
+    }
   };
 
-
+  // Clear Canvas
+  $scope.canvasClear = function(){
+    ctx.save();
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  };
 
   // ------- Add Rule / Delete Rule -----------------------------------------------
 
@@ -231,11 +245,9 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
     }
   }
 
-  function drawString( str , xStart , yStart , scaleFactor , rotation , startingAngle ){
+  function drawString( str , xStart , yStart , startingAngle ){
 
-    var ctx = canvas.getContext('2d');
     ctx.lineWidth = 2;
-
     var ch , angleRef = $scope.angle*(Math.PI / 180) , r = $scope.unit;
     var x = xStart , y = yStart, angle = startingAngle;
 
@@ -259,9 +271,7 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
       }else if( ch === '[' ){                                  // Recursive Call
         var k = getClosingBracket( i , str , ']' );
-        // ctx.save();
-        drawString( str.substring(i+1, k) , x , y , scaleFactor , rotation , angle );
-        // ctx.restore();
+        drawString( str.substring(i+1, k) , x , y , angle );
         i = k;
 
       }else{
@@ -271,46 +281,53 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
   }
 
   function fitToCanvas( xmin , xmax , ymin , ymax , str ){
-    var ctx = canvas.getContext('2d');
-    var xdis = xmax - xmin;
-    var ydis = ymax - ymin;
-    var w = canvas.width*0.7, h = canvas.height*0.7 , zoom , rotation = 0;
+    var xdis = xmax - xmin,
+        ydis = ymax - ymin,
+        w = canvas.width*0.7, h = canvas.height*0.7;
 
     if( w/xdis > h/ydis ){
-      zoom = h/ydis ;
+      scaleFactor = h/ydis ;
     }else{
-      zoom = w/xdis;
+      scaleFactor = w/xdis;
     }
     if( ydis > xdis ){
       rotation = -Math.PI/2;
+    }else {
+      rotation = 0;
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    var xStart = canvas.width/2 - (xmin + xdis/2)*zoom ,
-        yStart = canvas.height/2 - (ymin + ydis/2)*zoom;
+    var xStart = canvas.width/2 - (xmin + xdis/2)*scaleFactor ,
+        yStart = canvas.height/2 - (ymin + ydis/2)*scaleFactor;
 
+    panStartX = xStart;
+    panStartY = yStart;
+
+    // Center the piece and perform scaling
     ctx.translate( xStart , yStart );
-        ctx.scale( zoom , zoom );
+        ctx.scale( scaleFactor , scaleFactor );
     ctx.translate( -xStart , -yStart );
 
-    var midX = xStart + (canvas.width/2 - xStart)/zoom ,
-        midY = yStart + (canvas.height/2 - yStart)/zoom;
+    midX = xStart + (canvas.width/2 - xStart)/scaleFactor;
+    midY = yStart + (canvas.height/2 - yStart)/scaleFactor;
 
+    // Get to center of piece after scaling and perform rotation
     ctx.translate( midX , midY );
         ctx.rotate(rotation);
     ctx.translate( -midX  , -midY );
-    drawString( str , xStart , yStart , zoom , rotation , 0 );
+
+    drawString( str , xStart , yStart , 0 );
   }
 
   $scope.drawLSystem = function( ){
     // Get canvas context and end string
-
     if( !ready ){
       return;
     }
     $scope.isBusyDrawing = true;
 
-    var ctx = canvas.getContext('2d') , str;
+    var str;
+    scaleFactor = 1; rotation = 0; rotationCount = 0;
 
     if( $scope.lString  ){
       str = $scope.lString;
@@ -362,10 +379,23 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
       if( $scope.canvasMode === 1 ){
 
-        dx = newX - clickStartX;
-        dy = newY - clickStartY;
+        dx = (newX - clickStartX)/scaleFactor;
+        dy = (newY - clickStartY)/scaleFactor;
 
+        // Adjust for rotation and account for negative angles
+        var temp = dx;
+        if( rotation < 0 ){
+          dx = (dx*Math.cos(rotation))+(dy*Math.sin(rotation));
+          dy = (dy*Math.cos(rotation))-(temp*Math.sin(rotation));
+        }else{
+          dx = (dx*Math.cos(-rotation))-(dy*Math.sin(-rotation));
+          dy = (dy*Math.cos(-rotation))+(temp*Math.sin(-rotation));
+        }
 
+        // Clear Canvas
+        $scope.canvasClear();
+
+        drawString( $scope.lString , panStartX + dx , panStartY + dy, 0 );
       }
 
     }
@@ -374,6 +404,10 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
   // Mouse click/hold over
   $scope.canvasMouseUp = function( $event ){
      $scope.mouseDown = false;
+     panStartX = panStartX + dx;
+     panStartY = panStartY + dy;
+     midX = panStartX + (canvas.width/2 - panStartX)/scaleFactor;
+     midY = panStartY + (canvas.height/2 - panStartY)/scaleFactor;
      clickStartX = clickStartY = -1;
   };
 
@@ -381,6 +415,25 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
   $scope.canvasMouseLeave = function(  ){
     //  $scope.canvasMode = 0;
   };
+
+  $scope.canvasRotate = function( dir ){
+    if( dir === 'r' ){
+      rotationCount++;
+    }else{
+      rotationCount--;
+    }
+    if( rotation > 7 || rotation <-7 ){
+      rotationCount = 0;
+    }
+    var angle = rotation + ((Math.PI/4)*rotationCount);
+    console.log(rotation,angle);
+    ctx.translate( midX , midY );
+        ctx.rotate(angle);
+    ctx.translate( -midX  , -midY );
+    $scope.canvasClear();
+    drawString( $scope.lString , panStartX, panStartY , 0 );
+  };
+
 
   // ------ When the Page Loads  -----------------------------------------------
   angular.element(document).ready(function () {

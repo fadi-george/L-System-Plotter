@@ -71,27 +71,50 @@
             </h2>
             <span flex></span>
             <md-button class="md-icon-button" aria-label="Favorite">
-              <i class="material-icons">play_arrow</i>
+              <!-- <i class="material-icons">play_arrow</i> -->
             </md-button>
             <md-button class="md-icon-button" aria-label="More">
-              <i class="material-icons">play_arrow</i>
+              <!-- <i class="material-icons">play_arrow</i> -->
             </md-button>
           </div>
         </md-toolbar>
       </div >
       <div id = "cardWrapper" flex layout-padding >
         <!-- Canvas Graph  -->
-        <md-card id = "graphCard" ng-class="canvasChange" class="md-whiteframe-z2" flex >
-          <!-- <i class="material-icons crossHair">add</i> -->
+        <md-card id = "graphCard" ng-class="canvasChange" layout="row" class="md-whiteframe-z2" flex >
+
+          <div id="toolBoxTop" layout="row" flex >
+            <div flex layout-align="start center">
+              <md-button class="md-icon-button rotateLeft" aria-label="Rotate Left" ng-click="canvasRotate('l')">
+                <i class="material-icons">rotate_left</i>
+              </md-button>
+              <md-button class="md-icon-button rotateRight" aria-label="Rotate Right" ng-click="canvasRotate('r')">
+                <i class="material-icons">rotate_right</i>
+              </md-button>
+            </div>
+            <div flex layout-align="end center">
+              <md-button class="md-icon-button" aria-label="Rotate Left">
+                <i class="material-icons">rotate_left</i>
+              </md-button>
+              <md-button class="md-icon-button" aria-label="Rotate Right">
+                <i class="material-icons">rotate_right</i>
+              </md-button>
+            </div>
+          </div>
+
           <div  id = "canvasWrapper" flex >
-            <canvas id = "graphCanvas"  ng-mousedown="canvasMouseDown($event)" ng-mousemove="canvasMouseMove($event)" ng-mouseup="canvasMouseUp($event)" ng-mouseleave="canvasMouseLeave()" >
+            <canvas id = "graphCanvas" ng-class="{'cursorGrab': canvasMode === 1 && !mouseDown,
+            'cursorGrabbing': canvasMode === 1 && mouseDown, 'cursorZoomP': canvasMode === 2,
+            'cursorZoomM': canvasMode === 3}"
+            ng-mousedown="canvasMouseDown($event)" ng-mousemove="canvasMouseMove($event)"
+            ng-mouseup="canvasMouseUp($event)" ng-mouseleave="canvasMouseLeave()" >
             </canvs>
           </div>
-          <div layout="row" id = "graphTools">
+
+          <div id="toolBoxBot" layout="row" flex >
             <div flex layout-align="start center">
               <md-button ng-class="{'graphToolsActive' : canvasMode === 1}" class="md-icon-button" aria-label="Pan" ng-click="canvasMode = 1">
                 <i class="fa  fa-hand-paper-o"></i>
-                <!-- <i class="material-icons">pan_tool</i> -->
               </md-button>
               <md-button ng-class="{'graphToolsActive' : canvasMode === 2}" class="md-icon-button" aria-label="Zoom In" ng-click="canvasMode = 2">
                 <i class="material-icons">zoom_in</i>
@@ -100,8 +123,8 @@
                 <i class="material-icons">zoom_out</i>
               </md-button>
             </div>
-            <div id = "optionsBotRight" flex layout-align="end center">
-              <md-button class="md-icon-button" ng-click="fillScreen()" ng-show="!canvasChange.length">
+            <div flex layout-align="end center">
+              <md-button  class="md-icon-button" ng-click="fillScreen()" ng-show="!canvasChange.length">
                 <i class="material-icons ">fullscreen</i>
               </md-button>
               <md-button class="md-icon-button" ng-click="shrinkScreen()" ng-show="canvasChange.length" >

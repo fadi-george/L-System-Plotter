@@ -48,18 +48,11 @@ button:focus,i:focus {
 }
 
 /*** Canvas ***/
-.crossHair{
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  color: #D4D4D4;
-  font-size: 41px;
-  font-weight: 100;
-}
+
 canvas{
   width: 100%;
   height: 100%;
+  transition: transform .35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 #canvasWrapper{
   display:  flex;
@@ -163,10 +156,16 @@ canvas{
     float: right;
   }
 }
-#graphTools{
-  position: relative;
-  float: left;
-  margin-top: -40px;
+#toolBoxTop,#toolBoxBot{
+  position: absolute;
+  max-height: 56px;
+  width: 100%;
+  left: 0;
+  padding: 8px 4px;
+  z-index: 1;
+  .layout-align-end-center{
+    text-align: right;
+  }
   .md-icon-button{
     color: #A7A2A2;
     transition: color ease-in-out 0.15s , transform ease-in-out 0.15s;
@@ -175,6 +174,18 @@ canvas{
       transform: scale(1.4,1.4);
     }
   }
+}
+#toolBoxTop{ top: 0;       }
+#toolBoxBot{ bottom: 0px;  }
+.cursorGrab{  cursor: -webkit-grab;     }
+.cursorZoomP{ cursor: -webkit-zoom-in;  }
+.cursorZoomM{ cursor: -webkit-zoom-out; }
+.cursorGrabbing{ cursor: -webkit-grabbing; }
+.rotateRight:hover{
+  transform: rotate(45deg) scale(1.4,1.4) !important;
+}
+.rotateLeft:hover{
+  transform: rotate(-45deg) scale(1.4,1.4) !important; 
 }
 .graphToolsActive{
   color: #0E87FF !important;
