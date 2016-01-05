@@ -60,10 +60,14 @@
       <div>
         <md-toolbar id = "controlBar" class="md-whiteframe-z1">
           <div class="md-toolbar-tools">
-            <md-button class="md-icon-button" aria-label="Settings"  hide-gt-sm  ng-click="toggleLeft()">
+            <md-button class="md-icon-button" aria-label="Menu"  hide-gt-sm  ng-click="toggleLeft()">
               <i class="material-icons">menu</i>
             </md-button>
-            <md-button class="md-icon-button" aria-label="Settings"  ng-click="drawLSystem()" ng-disabled="isBusyDrawing">
+            <md-button class="md-icon-button" aria-label="Play"
+            popover-popup-delay="500" popover-trigger="mouseenter" 
+            uib-popover="Run"  popover-placement="right"
+            ng-click="drawLSystem()" ng-disabled="isBusyDrawing">
+
               <i class="material-icons" >play_arrow</i>
             </md-button>
             <h2>

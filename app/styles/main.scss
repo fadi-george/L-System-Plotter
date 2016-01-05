@@ -151,14 +151,14 @@ canvas{
 }
 
 /*** Graph Options ***/
-#optionsBotRight{
-  .md-icon-button{
-    position: relative;
-    float: right;
-  }
+.noneSelect{
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }
 #toolBoxTop,#toolBoxBot{
   position: absolute;
+  @extend .noneSelect;
   max-height: 56px;
   width: 100%;
   left: 0;
@@ -168,6 +168,7 @@ canvas{
     text-align: right;
   }
   .md-icon-button{
+    @extend .noneSelect;
     color: #A7A2A2;
     transition: color ease-in-out 0.15s , transform ease-in-out 0.15s;
     &:hover{
@@ -211,6 +212,23 @@ canvas{
     display: none;
 }
 
+/*** Popover ***/
+.popover{
+  box-shadow: 0px 2px 8px 0px rgba(12, 12, 12, 0.28);
+  color: #FFFFFF;
+  font-family: 'Roboto';
+  font-weight: 300;
+  font-size: 14px;
+  border-radius: 3px;
+  background: rgb(136, 136, 136);
+  border: 1px solid #797979;
+  .arrow{
+    display: none;
+  }
+}
+.popover-content{
+  padding: 6px 12px;
+}
 @media (max-width: 960px) {
   #inputSplit{
     input{
