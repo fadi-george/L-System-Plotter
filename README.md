@@ -10,6 +10,11 @@ This is a simple tool to plot Lindenmayer system (l-system) which plots fractals
 
 Run `grunt` for building and `grunt serve` for preview.
 
+## Interface preview
+
+Shows the plot of this dragon curve with the rules as shown below.
+
+![alt tag](https://dl.dropboxusercontent.com/u/2920751/LSystem.png)
 
 ## Current Features
 
