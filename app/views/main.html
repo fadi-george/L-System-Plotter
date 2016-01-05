@@ -63,7 +63,7 @@
             <md-button class="md-icon-button" aria-label="Settings"  hide-gt-sm  ng-click="toggleLeft()">
               <i class="material-icons">menu</i>
             </md-button>
-            <md-button class="md-icon-button" aria-label="Settings"  tooltip-placement="right" uib-tooltip="Run"  tooltip-class="whiteBox"  ng-click="drawLSystem()" ng-disabled="isBusyDrawing">
+            <md-button class="md-icon-button" aria-label="Settings"  ng-click="drawLSystem()" ng-disabled="isBusyDrawing">
               <i class="material-icons" >play_arrow</i>
             </md-button>
             <h2>
@@ -93,12 +93,10 @@
               </md-button>
             </div>
             <div flex layout-align="end center">
-              <md-button class="md-icon-button" aria-label="Rotate Left">
-                <i class="material-icons">rotate_left</i>
+              <md-button class="md-icon-button" aria-label="Download" ng-click="downloadImg()">
+                <i class="material-icons">file_download</i>
               </md-button>
-              <md-button class="md-icon-button" aria-label="Rotate Right">
-                <i class="material-icons">rotate_right</i>
-              </md-button>
+              <a target="_blank" id = "hiddenLink"  download="canvas.jpg" ng-hide="true" href=""></a>
             </div>
           </div>
 

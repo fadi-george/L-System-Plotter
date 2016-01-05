@@ -30,7 +30,7 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
       ctx = canvas.getContext('2d') , ready = false,
       clickStartX , clickStartY , newX , newY , dx , dy ,
       panStartX , panStartY , midX , midY ,
-      scaleFactor = 1 , rotation , rotationCount = 0;
+      scaleFactor = 1 , rotation , rotationCount = 0 , zoomCount = 0;
 
   // Save in case of Refresh
   if( localStorage.axiom ){
@@ -49,7 +49,7 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       $scope.drawLSystem();
-    } , 150);
+    } , 350);
   }
   if( localStorage.gRules ){
     var arr = JSON.parse( localStorage.gRules );
@@ -98,7 +98,9 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
   // Take axiom and perform replacement operations for each rule
   function iterateString(){
-    var newStr , cnt , ch , prev = $scope.axiom;
+    var newStr , cnt , ch , prev = $scope.axiom ,
+        timeStart = window.performance.now() , warnFlag = true;
+
     // Iterate on number of steps
     for (var i = 0; i < $scope.steps; i++) {
 
@@ -247,6 +249,13 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
   function drawString( str , xStart , yStart , startingAngle ){
 
+    ctx.save();
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.fillStyle='#FFFFFF';
+      ctx.rect(0,0,canvas.width,canvas.height);
+      ctx.fill();
+    ctx.restore();
+
     ctx.lineWidth = 2;
     var ch , angleRef = $scope.angle*(Math.PI / 180) , r = $scope.unit;
     var x = xStart , y = yStart, angle = startingAngle;
@@ -366,21 +375,49 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
   // ------ Graph Tools  -----------------------------------------------
 
   $scope.canvasMouseDown = function( $event ){
-    clickStartX = $event.offsetX;
-    clickStartY = $event.offsetY;
+    clickStartX = $event.offsetX/scaleFactor;
+    clickStartY = $event.offsetY/scaleFactor;
     $scope.mouseDown = true;
+    var scale;
+
+    if( $scope.canvasMode === 2 ){
+      scale = 1.2;
+      zoomCount++;
+
+    }else if( $scope.canvasMode === 3 ){
+      scale = 1/1.2;
+      zoomCount--;
+    }
+    if(  $scope.canvasMode > 1 ){
+      scaleFactor = scaleFactor*scale;
+      clickStartX = ($event.offsetX - canvas.width/2);
+      clickStartY = ($event.offsetY - canvas.height/2);
+      // console.log(clickStartX  , clickStartY , midX , midY , panStartX , panStartY);
+      newX = midX + clickStartX/scaleFactor;
+      newY = midY + clickStartY/scaleFactor;
+
+      ctx.translate(  newX ,  newY );
+        ctx.scale(scale,scale);
+      ctx.translate( -newX , -newY );
+
+      $scope.canvasClear();
+      drawString( $scope.lString , panStartX ,
+                  panStartY , 0 );
+    }
   };
 
   $scope.canvasMouseMove = function( $event ){
-    newX = $event.offsetX;
-    newY = $event.offsetY;
+
 
     if( $scope.mouseDown ){
 
       if( $scope.canvasMode === 1 ){
 
-        dx = (newX - clickStartX)/scaleFactor;
-        dy = (newY - clickStartY)/scaleFactor;
+        newX = $event.offsetX/scaleFactor;
+        newY = $event.offsetY/scaleFactor;
+
+        dx = newX - clickStartX;
+        dy = newY - clickStartY;
 
         // Adjust for rotation and account for negative angles
         var temp = dx;
@@ -392,9 +429,7 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
           dy = (dy*Math.cos(-rotation))+(temp*Math.sin(-rotation));
         }
 
-        // Clear Canvas
         $scope.canvasClear();
-
         drawString( $scope.lString , panStartX + dx , panStartY + dy, 0 );
       }
 
@@ -404,29 +439,31 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
   // Mouse click/hold over
   $scope.canvasMouseUp = function( $event ){
      $scope.mouseDown = false;
-     panStartX = panStartX + dx;
-     panStartY = panStartY + dy;
-     midX = panStartX + (canvas.width/2 - panStartX)/scaleFactor;
-     midY = panStartY + (canvas.height/2 - panStartY)/scaleFactor;
+     if( $scope.canvasMode === 1 ){
+       panStartX = panStartX + dx;
+       panStartY = panStartY + dy;
+       midX = panStartX + (canvas.width/2 - panStartX)/scaleFactor;
+       midY = panStartY + (canvas.height/2 - panStartY)/scaleFactor;
+     }
      clickStartX = clickStartY = -1;
   };
 
-  // Clear Mode if outside canvas
   $scope.canvasMouseLeave = function(  ){
     //  $scope.canvasMode = 0;
   };
 
+  // Rotate in 45 degree increments
   $scope.canvasRotate = function( dir ){
+    var angle;
     if( dir === 'r' ){
-      rotationCount++;
+      angle = Math.PI/4;
     }else{
-      rotationCount--;
+      angle = -Math.PI/4;
     }
-    if( rotation > 7 || rotation <-7 ){
-      rotationCount = 0;
-    }
-    var angle = rotation + ((Math.PI/4)*rotationCount);
-    console.log(rotation,angle);
+    rotation = rotation + angle;
+    // newX = (panStartX*Math.cos(-rotation))-(panStartY*Math.sin(-rotation));
+    // newY = (panStartY*Math.cos(-rotation))+(panStartX*Math.sin(-rotation));
+
     ctx.translate( midX , midY );
         ctx.rotate(angle);
     ctx.translate( -midX  , -midY );
@@ -434,6 +471,13 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
     drawString( $scope.lString , panStartX, panStartY , 0 );
   };
 
+  // Download Image of Canvas
+  $scope.downloadImg = function(){
+    var link = angular.element( document.querySelector( '#hiddenLink' ) )[0];
+    console.log(link);
+    link.href = canvas.toDataURL();
+    link.click();
+  };
 
   // ------ When the Page Loads  -----------------------------------------------
   angular.element(document).ready(function () {

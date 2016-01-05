@@ -53,6 +53,7 @@ canvas{
   width: 100%;
   height: 100%;
   transition: transform .35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  padding: 0px !important;
 }
 #canvasWrapper{
   display:  flex;
@@ -185,7 +186,7 @@ canvas{
   transform: rotate(45deg) scale(1.4,1.4) !important;
 }
 .rotateLeft:hover{
-  transform: rotate(-45deg) scale(1.4,1.4) !important; 
+  transform: rotate(-45deg) scale(1.4,1.4) !important;
 }
 .graphToolsActive{
   color: #0E87FF !important;
