@@ -216,21 +216,22 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
   function getBoundary( str  , xStart , yStart , angleIn ){
 
-    var ch , r = $scope.unit , x = xStart , y = xStart;
-    var angleRef = $scope.angle*(Math.PI / 180) , angle = angleIn;
+    var ch , r = $scope.unit , x = xStart , y = yStart,
+        angleRef = $scope.angle*(Math.PI / 180) ,
+       angle = angleIn , minX , minY , maxX , maxY;                  // Local Displacment Changes
 
     for (var i = 0; i < str.length; i++) {
       ch = str[i];
 
-      if( ch === 'F' ){           // Forward Segment
-        x = x + r*Math.cos(angle);
-        y = y + r*Math.sin(angle);
+      if( ch === 'F' || ch === 'G' ){                  // Move Forward
+        x = x + (r*Math.cos(angle));
+        y = y + (r*Math.sin(angle));
         xmin = Math.min(x,xmin);
         xmax = Math.max(x,xmax);
         ymin = Math.min(y,ymin);
         ymax = Math.max(y,ymax);
 
-      }else if( ch === '+' ){     // Update Angle
+      }else if( ch === '+' ){              // Update Angle
         angle += angleRef;
 
       }else if( ch === '-' ){
@@ -249,13 +250,6 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
   function drawString( str , xStart , yStart , startingAngle ){
 
-    ctx.save();
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.fillStyle='#FFFFFF';
-      ctx.rect(0,0,canvas.width,canvas.height);
-      ctx.fill();
-    ctx.restore();
-
     ctx.lineWidth = 2;
     var ch , angleRef = $scope.angle*(Math.PI / 180) , r = $scope.unit;
     var x = xStart , y = yStart, angle = startingAngle;
@@ -271,6 +265,10 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
         ctx.lineTo( x , y );
         ctx.lineCap = 'round';
         ctx.stroke();
+
+      }else if( ch === 'G' ){              // Move Forward but Dont Draw
+        x = x + r*Math.cos(angle);
+        y = y + r*Math.sin(angle);
 
       }else if( ch === '+' ){              // Update Angle
         angle += angleRef;
@@ -324,7 +322,7 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
     ctx.translate( midX , midY );
         ctx.rotate(rotation);
     ctx.translate( -midX  , -midY );
-
+    console.log(xStart,yStart);
     drawString( str , xStart , yStart , 0 );
   }
 
@@ -360,9 +358,11 @@ app.controller('MainCtrl', function( $scope , $timeout ,  $mdSidenav , $mdToast 
 
     // Reset Transform
     ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle='#FFFFFF';
+    ctx.rect(0,0,canvas.width,canvas.height);
 
     // Clean Canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     xmin = 0; ymin = 0; xmax = 0; ymax = 0;
     getBoundary( str , 0 , 0 , 0 );
 
