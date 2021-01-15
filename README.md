@@ -14,7 +14,7 @@ Run `grunt` for building and `grunt serve` for preview.
 
 Shows the plot of this dragon curve with the rules as shown below.
 
-![LSystem](https://www.dropbox.com/s/kbi7yk43rcza64k/LSystem.png?dl=0)
+![LSystem](https://dl.dropboxusercontent.com/s/fh5wlhec66c05iz/LSystem.png?dl=0)
 
 ## Current Features
 
