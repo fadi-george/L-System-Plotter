@@ -1,4 +1,4 @@
-# l-system
+# L-System
 
 This project is generated with [yo angular generator](https://github.com/yeoman/generator-angular)
 version 0.15.1.
@@ -14,7 +14,7 @@ Run `grunt` for building and `grunt serve` for preview.
 
 Shows the plot of this dragon curve with the rules as shown below.
 
-![alt tag](https://dl.dropboxusercontent.com/u/2920751/LSystem.png)
+![alt tag](https://www.dropbox.com/s/kbi7yk43rcza64k/LSystem.png?dl=0)
 
 ## Current Features
 
