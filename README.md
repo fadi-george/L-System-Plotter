@@ -3,8 +3,8 @@
 This project is generated with [yo angular generator](https://github.com/yeoman/generator-angular)
 version 0.15.1.
 
-Project idea that I was inspired to build after learning about l-systems.
-This is a simple tool to plot Lindenmayer system (l-system) which plots fractals given some rules and angle. Currently, this tool plots in 2-D.
+Project idea that I was inspired to build after learning about Lindenmayer system (l-system).
+This is a simple tool to plot l-system which plots fractals given some rules and angle. Currently, this tool plots in 2-D.
 
 
 ## Build & development
