@@ -21,7 +21,7 @@ Shows the plot of this dragon curve with the rules as shown below.
 
 Able to pan, zoom in, zoom out, and rotate in 45 degree increments. And you can also download an image of the canvas.
 
-## Future Additions
+## Like to Have
 
 - Color settings for the plot and the background.
 - Specify width for stroke.
